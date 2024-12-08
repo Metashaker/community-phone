@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { LoggerModule } from 'nestjs-pino';
-import { CallsController } from './modules/calls/calls.controller';
-import { PrismaModule } from './libraries/prisma.module';
+import { LoggerModule } from './libraries/logger/logger.module';
+import { PrismaModule } from './libraries/prisma/prisma.module';
 import { CallsModule } from './modules/calls/calls.module';
 
 @Module({
@@ -13,19 +12,9 @@ import { CallsModule } from './modules/calls/calls.module';
     CallsModule,
     //config
     ConfigModule.forRoot({ isGlobal: true }),
-    LoggerModule.forRoot({
-      pinoHttp: {
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-          },
-        },
-        level: process.env.LOG_LEVEL || 'info',
-      },
-    }),
+    LoggerModule,
   ],
-  controllers: [CallsController],
+  controllers: [],
   providers: [],
 })
 export class AppModule {}

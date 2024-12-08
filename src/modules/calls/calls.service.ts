@@ -1,8 +1,10 @@
-import { PrismaService } from 'src/libraries/prisma.service';
+import { PrismaService } from 'src/libraries/prisma/prisma.service';
 import { Call } from '@prisma/client';
 import { PinoLogger } from 'nestjs-pino';
 import { CreateCallInput, EndCallInput } from './calls.schemas';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class CallsService {
   constructor(
     private readonly prisma: PrismaService,
@@ -49,7 +51,7 @@ export class CallsService {
       // Get the time 60 minutes ago in UTC (minimum time to consider a call as failed)
       const sixtyMinutesAgo = new Date(nowUTC.getTime() - 60 * 60 * 1000);
 
-      return this.prisma.call.findMany({
+      return await this.prisma.call.findMany({
         where: {
           AND: [
             { startedAt: { gte: twoHoursAgo.toISOString() } },
@@ -60,7 +62,7 @@ export class CallsService {
       });
     } catch (e) {
       this.logger.error({ error: e }, 'FailedToGetFailedCalls');
-      throw new Error('Failed to get failed calls');
+      throw new Error(`Failed to get failed calls: ${e}`);
     }
   }
 }

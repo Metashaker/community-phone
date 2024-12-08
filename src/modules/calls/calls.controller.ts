@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Response } from '@nestjs/common';
-import { CallEventDTO } from './calls.schemas';
+import { CallEventDTO, FailedCallDTO } from './calls.schemas';
 import { CallsService } from './calls.service';
 
 @Controller('events')
@@ -15,9 +15,8 @@ export class CallsController {
    *  so we don't return calls that have less than 60 minutes since they were started
    *  since they could still be going.
    */
-  async getFailedCalls() {
-    //@todo: implement this service method
-    return [];
+  async getFailedCalls(): Promise<FailedCallDTO[]> {
+    return await this.callsService.getFailedCalls();
   }
 
   @Post()
