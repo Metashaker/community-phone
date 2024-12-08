@@ -1,8 +1,14 @@
 // DTO types
 export type CallEventDTO =
-  | { callId: string; from: string; to: string; started: string; ended?: never }
   | {
-      callId: string;
+      call_id: string;
+      from: string;
+      to: string;
+      started: string;
+      ended?: never;
+    }
+  | {
+      call_id: string;
       from: string;
       to: string;
       ended: string;
