@@ -1,25 +1,20 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { LoggerModule } from 'nestjs-pino';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { LoggerModule } from './libraries/logger/logger.module';
+import { PrismaModule } from './libraries/prisma/prisma.module';
+import { CallsModule } from './modules/calls/calls.module';
 
 @Module({
   imports: [
+    //libs
+    PrismaModule,
+    //modules
+    CallsModule,
+    //config
     ConfigModule.forRoot({ isGlobal: true }),
-    LoggerModule.forRoot({
-      pinoHttp: {
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-          },
-        },
-        level: process.env.LOG_LEVEL || 'info',
-      },
-    }),
+    LoggerModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

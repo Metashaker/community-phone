@@ -13,14 +13,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Calls {
-  id              Int      @id @default(autoincrement())
-  remoteCallId    String   @unique @map("remote_call_id")
+model Call {
+  id              Int       @id @default(autoincrement())
+  remoteCallId    String    @unique @map("remote_call_id")
   from            String   
   to              String
-  startedAt       DateTime @db.Timestamptz()  @map("started_at")
-  endedAt         DateTime? @db.Timestamptz()  @map("ended_at")
-  durationInMs    Int?      @map("duration_in_ms")
+  startedAt       DateTime  @db.Timestamp  @map("started_at")
+  endedAt         DateTime? @db.Timestamp  @map("ended_at")
 //reconciledAt    DateTime @db.Timestamptz()  @map("reconciled_at")
 
   @@map("calls")
