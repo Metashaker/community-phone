@@ -14,7 +14,7 @@ export class CallsController {
   @Post()
   async createCall(@Body() request: CallEventDTO, @Res() response) {
     if (request?.started) {
-      const { success } = await this.callsService.createCall({
+      const { success } = await this.callsService.addCallToCreateToQueue({
         remoteCallId: request.call_id,
         from: request.from,
         to: request.to,
@@ -28,7 +28,7 @@ export class CallsController {
           .send({ success });
       }
     } else if (request?.ended) {
-      const { success } = await this.callsService.markCallEnded({
+      const { success } = await this.callsService.addCallToEndToQueue({
         remoteCallId: request.call_id,
         endedAt: new Date(new Date(request.ended).toISOString()),
       });

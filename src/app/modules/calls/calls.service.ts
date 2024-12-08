@@ -14,12 +14,26 @@ export class CallsService {
     @InjectQueue('callsWebhooks') private readonly callsWebhooksQueue: Queue,
   ) {}
 
-  async addCallToCreateToQueue(call: CreateCallInput): Promise<void> {
-    await this.callsWebhooksQueue.add('processCreateCall', call);
+  async addCallToCreateToQueue(
+    call: CreateCallInput,
+  ): Promise<{ success: boolean }> {
+    try {
+      await this.callsWebhooksQueue.add('processCreateCall', call);
+      return { success: true };
+    } catch (e) {
+      this.logger.error({ error: e }, 'FailedToEnqueueCreateCall');
+      return { success: false };
+    }
   }
 
-  async addCallToEndToQueue(call: EndCallInput): Promise<void> {
-    await this.callsWebhooksQueue.add('processEndCall', call);
+  async addCallToEndToQueue(call: EndCallInput): Promise<{ success: boolean }> {
+    try {
+      await this.callsWebhooksQueue.add('processEndCall', call);
+      return { success: true };
+    } catch (e) {
+      this.logger.error({ error: e }, 'FailedToEnqueueEndCall');
+      return { success: false };
+    }
   }
 
   /**
