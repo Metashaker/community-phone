@@ -22,5 +22,6 @@ model Call {
   endedAt         DateTime? @db.Timestamp  @map("ended_at")
 //reconciledAt    DateTime @db.Timestamptz()  @map("reconciled_at")
 
+  @@index(remoteCallId)
   @@map("calls")
 }
