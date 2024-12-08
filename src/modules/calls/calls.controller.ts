@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Response } from '@nestjs/common';
 import { CallEventDTO } from './calls.schemas';
-import { Calls } from '@prisma/client';
 import { CallsService } from './calls.service';
 
 @Controller('events')
@@ -16,7 +15,7 @@ export class CallsController {
    *  so we don't return calls that have less than 60 minutes since they were started
    *  since they could still be going.
    */
-  async getFailedCalls(): Promise<Calls[]> {
+  async getFailedCalls() {
     //@todo: implement this service method
     return [];
   }
