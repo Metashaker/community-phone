@@ -18,7 +18,6 @@ export class CallsService {
    */
   async createCall(call: CreateCallInput): Promise<{ success: boolean }> {
     try {
-
       await this.prisma.call.create({
         data: {
           remoteCallId: call.remoteCallId,
