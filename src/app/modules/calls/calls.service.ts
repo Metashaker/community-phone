@@ -18,8 +18,12 @@ export class CallsService {
     call: CreateCallInput,
   ): Promise<{ success: boolean }> {
     try {
-      await this.callsWebhooksQueue.add('processCreateCall', call);
-      return { success: true };
+      const job = await this.callsWebhooksQueue.add('processCreateCall', call);
+      if (job?.id) {
+        return { success: true };
+      } else {
+        return { success: false };
+      }
     } catch (e) {
       this.logger.error({ error: e }, 'FailedToEnqueueCreateCall');
       return { success: false };
@@ -28,8 +32,12 @@ export class CallsService {
 
   async addCallToEndToQueue(call: EndCallInput): Promise<{ success: boolean }> {
     try {
-      await this.callsWebhooksQueue.add('processEndCall', call);
-      return { success: true };
+      const job = await this.callsWebhooksQueue.add('processEndCall', call);
+      if (job?.id) {
+        return { success: true };
+      } else {
+        return { success: false };
+      }
     } catch (e) {
       this.logger.error({ error: e }, 'FailedToEnqueueEndCall');
       return { success: false };
