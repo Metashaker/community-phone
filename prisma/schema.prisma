@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Calls {
+model Call {
   id              Int      @id @default(autoincrement())
   remoteCallId    String   @unique @map("remote_call_id")
   from            String   
