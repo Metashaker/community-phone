@@ -1,15 +1,26 @@
-import { PrismaService } from 'src/libraries/prisma/prisma.service';
+import { PrismaService } from 'src/app/libraries/prisma/prisma.service';
 import { Call } from '@prisma/client';
 import { PinoLogger } from 'nestjs-pino';
 import { CreateCallInput, EndCallInput } from './calls.schemas';
 import { Injectable } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class CallsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly logger: PinoLogger,
+    @InjectQueue('callsWebhooks') private readonly callsWebhooksQueue: Queue,
   ) {}
+
+  async addCallToCreateToQueue(call: CreateCallInput): Promise<void> {
+    await this.callsWebhooksQueue.add('processCreateCall', call);
+  }
+
+  async addCallToEndToQueue(call: EndCallInput): Promise<void> {
+    await this.callsWebhooksQueue.add('processEndCall', call);
+  }
 
   /**
    *  Receives webhook events from different phone carriers for the `call_started` event, and saves them to the database.
@@ -29,7 +40,7 @@ export class CallsService {
       return { success: true };
     } catch (e) {
       this.logger.error({ error: e }, 'FailedCallCreation');
-      throw new Error('Failed to create call');
+      return { success: false };
     }
   }
 
@@ -50,7 +61,7 @@ export class CallsService {
       return { success: true };
     } catch (e) {
       this.logger.error({ error: e }, 'FailedCallEnd');
-      throw new Error('Failed to mark call as ended');
+      return { success: false };
     }
   }
 
@@ -83,7 +94,7 @@ export class CallsService {
       });
     } catch (e) {
       this.logger.error({ error: e }, 'FailedToGetFailedCalls');
-      throw new Error(`Failed to get failed calls: ${e}`);
+      return [];
     }
   }
 }

@@ -20,13 +20,25 @@ export class CallsController {
         to: request.to,
         startedAt: new Date(new Date(request.started).toISOString()),
       });
-      return response.status(HttpStatus.CREATED).send({ success });
+      if (success) {
+        return response.status(HttpStatus.CREATED).send({ success });
+      } else {
+        return response
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .send({ success });
+      }
     } else if (request?.ended) {
       const { success } = await this.callsService.markCallEnded({
         remoteCallId: request.call_id,
         endedAt: new Date(new Date(request.ended).toISOString()),
       });
-      return response.status(HttpStatus.OK).send({ success });
+      if (success) {
+        return response.status(HttpStatus.OK).send({ success });
+      } else {
+        return response
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .send({ success });
+      }
     } else {
       return response.status(HttpStatus.BAD_REQUEST).send({ success: false });
     }
