@@ -11,6 +11,11 @@ export class CallsService {
     private readonly logger: PinoLogger,
   ) {}
 
+  /**
+   *  Receives webhook events from different phone carriers for the `call_started` event, and saves them to the database.
+   *
+   * **Note**: All dates are stored in UTC.
+   */
   async createCall(call: CreateCallInput) {
     try {
       await this.prisma.call.create({
@@ -27,6 +32,12 @@ export class CallsService {
     }
   }
 
+  /**
+   * Receives webhook events from different phone carriers for the `call_ended` event, and updates the call
+   * with a `ended_at` timestamp.
+   *
+   * **Note**: All dates are stored in UTC.
+   */
   async markCallEnded(call: EndCallInput) {
     try {
       await this.prisma.call.update({
@@ -41,6 +52,14 @@ export class CallsService {
     }
   }
 
+  /**
+   * Returns a list of calls from the last 2 hours,
+   * that failed to be marked as ended due to an unreceived webhook event.
+   *
+   * **Note**: Calls can last 60 minutes max,
+   *  so we don't return calls that have less than 60 minutes since they were started
+   *  since they could still be going.
+   */
   async getFailedCalls(): Promise<Call[]> {
     try {
       // Get the current time in UTC
