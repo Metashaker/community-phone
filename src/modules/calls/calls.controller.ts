@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Response } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res, HttpStatus } from '@nestjs/common';
 import { CallEventDTO, FailedCallDTO } from './calls.schemas';
 import { CallsService } from './calls.service';
 
@@ -12,28 +12,21 @@ export class CallsController {
   }
 
   @Post()
-  async createCall(
-    @Body() request: CallEventDTO,
-    @Response() response: Response,
-  ) {
-    try {
-      if (request?.started) {
-        await this.callsService.createCall({
-          remoteCallId: request.callId,
-          from: request.from,
-          to: request.to,
-          startedAt: request.started,
-        });
-      } else if (request?.ended) {
-        await this.callsService.markCallEnded({
-          remoteCallId: request.callId,
-          endedAt: request.ended,
-        });
-      }
-    } finally {
-      // @todo: return 201 OK to the webhook provider to reduce latency once job is enqueued,
-      // if it fails we'll retry
-      return response.status;
+  async createCall(@Body() request: CallEventDTO, @Res() response) {
+    if (request?.started) {
+      await this.callsService.createCall({
+        remoteCallId: request.callId,
+        from: request.from,
+        to: request.to,
+        startedAt: new Date(new Date(request.started).toISOString()),
+      });
+      return response.status(HttpStatus.CREATED).send({ success: true });
+    } else if (request?.ended) {
+      await this.callsService.markCallEnded({
+        remoteCallId: request.callId,
+        endedAt: new Date(new Date(request.ended).toISOString()),
+      });
+      return response.status(HttpStatus.OK).send({ success: true });
     }
   }
 }

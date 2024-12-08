@@ -16,8 +16,9 @@ export class CallsService {
    *
    * **Note**: All dates are stored in UTC.
    */
-  async createCall(call: CreateCallInput) {
+  async createCall(call: CreateCallInput): Promise<{ success: boolean }> {
     try {
+
       await this.prisma.call.create({
         data: {
           remoteCallId: call.remoteCallId,
@@ -26,6 +27,7 @@ export class CallsService {
           startedAt: call.startedAt,
         },
       });
+      return { success: true };
     } catch (e) {
       this.logger.error({ error: e }, 'FailedCallCreation');
       throw new Error('Failed to create call');
@@ -38,7 +40,7 @@ export class CallsService {
    *
    * **Note**: All dates are stored in UTC.
    */
-  async markCallEnded(call: EndCallInput) {
+  async markCallEnded(call: EndCallInput): Promise<{ success: boolean }> {
     try {
       await this.prisma.call.update({
         where: { remoteCallId: call.remoteCallId },
@@ -46,6 +48,7 @@ export class CallsService {
           endedAt: call.endedAt,
         },
       });
+      return { success: true };
     } catch (e) {
       this.logger.error({ error: e }, 'FailedCallEnd');
       throw new Error('Failed to mark call as ended');
@@ -68,13 +71,13 @@ export class CallsService {
       // Get the time 2 hours ago in UTC
       const twoHoursAgo = new Date(nowUTC.getTime() - 2 * 60 * 60 * 1000);
       // Get the time 60 minutes ago in UTC (minimum time to consider a call as failed)
-      const sixtyMinutesAgo = new Date(nowUTC.getTime() - 60 * 60 * 1000);
+      const oneHourAgo = new Date(nowUTC.getTime() - 60 * 60 * 1000);
 
       return await this.prisma.call.findMany({
         where: {
           AND: [
             { startedAt: { gte: twoHoursAgo.toISOString() } },
-            { startedAt: { lte: sixtyMinutesAgo.toISOString() } },
+            { startedAt: { lte: oneHourAgo.toISOString() } },
             { endedAt: null },
           ],
         },

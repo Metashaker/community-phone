@@ -1,7 +1,7 @@
 // DTO types
 export type CallEventDTO =
-  | { callId: string; from: string; to: string; started: Date; ended?: never }
-  | { callId: string; from: string; to: string; ended: Date; started?: never };
+  | { callId: string; from: string; to: string; started: string; ended?: never }
+  | { callId: string; from: string; to: string; ended: string; started?: never };
 
 export type FailedCallDTO = {
   id: number;
