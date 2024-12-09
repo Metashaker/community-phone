@@ -5,20 +5,25 @@ import { CreateCallInput, EndCallInput } from './calls.schemas';
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { CALLS_WEBHOOKS_QUEUE } from 'src/app/shared/queues';
 
 @Injectable()
 export class CallsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly logger: PinoLogger,
-    @InjectQueue('callsWebhooks') private readonly callsWebhooksQueue: Queue,
+    @InjectQueue(CALLS_WEBHOOKS_QUEUE.name)
+    private readonly callsWebhooksQueue: Queue,
   ) {}
 
   async addCallToCreateToQueue(
     call: CreateCallInput,
   ): Promise<{ success: boolean }> {
     try {
-      const job = await this.callsWebhooksQueue.add('processCreateCall', call);
+      const job = await this.callsWebhooksQueue.add(
+        CALLS_WEBHOOKS_QUEUE.jobs.createCall,
+        call,
+      );
       if (job?.id) {
         return { success: true };
       } else {
@@ -32,7 +37,10 @@ export class CallsService {
 
   async addCallToEndToQueue(call: EndCallInput): Promise<{ success: boolean }> {
     try {
-      const job = await this.callsWebhooksQueue.add('processEndCall', call);
+      const job = await this.callsWebhooksQueue.add(
+        CALLS_WEBHOOKS_QUEUE.jobs.endCall,
+        call,
+      );
       if (job?.id) {
         return { success: true };
       } else {

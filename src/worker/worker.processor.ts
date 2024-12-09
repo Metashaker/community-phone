@@ -6,8 +6,9 @@ import {
   CreateCallInput,
   EndCallInput,
 } from '../app/modules/calls/calls.schemas';
+import { CALLS_WEBHOOKS_QUEUE } from 'src/app/shared/queues';
 
-@Processor('callsWebhooks')
+@Processor(CALLS_WEBHOOKS_QUEUE.name)
 export class WebhookProcessor extends WorkerHost {
   constructor(
     private readonly callsService: CallsService,
@@ -27,10 +28,10 @@ export class WebhookProcessor extends WorkerHost {
       );
 
       switch (job.name) {
-        case 'processCreateCall':
+        case CALLS_WEBHOOKS_QUEUE.jobs.createCall:
           await this.handleCreateCall(job.data as CreateCallInput);
           break;
-        case 'processEndCall':
+        case CALLS_WEBHOOKS_QUEUE.jobs.endCall:
           await this.handleEndCall(job.data as EndCallInput);
           break;
         default:
