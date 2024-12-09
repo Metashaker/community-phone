@@ -13,14 +13,12 @@ const redisOptions =
         maxRetriesPerRequest: null,
         tls: { rejectUnauthorized: process.env.NODE_ENV === 'development' },
       });
+
 @Module({
   imports: [
     BullModule.forRootAsync({
       useFactory: () => ({
-        connection: {
-          url: process.env.REDIS_URL ?? 'redis://localhost:6379',
-          redisOptions,
-        },
+        connection: redisOptions,
       }),
     }),
     BullModule.registerQueue({
