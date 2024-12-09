@@ -1,3 +1,3 @@
 release: bash ./heroku-scripts/release-tasks.sh
-web: node dist/src/main
-jobs: node dist/src/worker
+web: node dist/main
+jobs: node dist/worker
