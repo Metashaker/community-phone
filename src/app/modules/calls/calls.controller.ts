@@ -1,18 +1,22 @@
 import { Controller, Get, Post, Body, Res, HttpStatus } from '@nestjs/common';
 import { CallEventDTO, FailedCallDTO } from './calls.schemas';
 import { CallsService } from './calls.service';
+import { Response } from 'src/app/shared/shared.types';
 
 @Controller('events')
 export class CallsController {
   constructor(private readonly callsService: CallsService) {}
 
   @Get('/failures')
-  async getFailedCalls(): Promise<FailedCallDTO[]> {
+  async getFailedCalls(): Promise<Response<FailedCallDTO[]>> {
     return await this.callsService.getFailedCalls();
   }
 
   @Post()
-  async createCall(@Body() request: CallEventDTO, @Res() response) {
+  async createCall(
+    @Body() request: CallEventDTO,
+    @Res() response,
+  ): Promise<Response> {
     if (request?.started) {
       const { success } = await this.callsService.addCallToCreateToQueue({
         remoteCallId: request.call_id,

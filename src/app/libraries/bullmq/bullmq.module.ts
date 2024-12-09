@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
+import { CALLS_WEBHOOKS_QUEUE } from 'src/app/shared/constants';
 
 @Module({
   imports: [
@@ -8,15 +9,16 @@ import { BullModule } from '@nestjs/bullmq';
         connection: {
           url: process.env.REDIS_URL ?? 'redis://localhost:6379',
           redisOptions: {
-            tls: process.env.REDIS_URL?.includes('localhost')
-              ? undefined
-              : { rejectUnauthorized: false },
+            tls:
+              process.env.NODE_ENV === 'development'
+                ? undefined
+                : { rejectUnauthorized: false },
           },
         },
       }),
     }),
     BullModule.registerQueue({
-      name: 'callsWebhooks',
+      name: CALLS_WEBHOOKS_QUEUE.name,
       defaultJobOptions: {
         attempts: 3,
         backoff: {
