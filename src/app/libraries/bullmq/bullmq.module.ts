@@ -9,6 +9,7 @@ import { CALLS_WEBHOOKS_QUEUE } from 'src/app/shared/constants';
         connection: {
           url: process.env.REDIS_URL ?? 'redis://localhost:6379',
           redis: {
+            checkServerIdentity: () => undefined, //bypass hostname validation
             tls:
               process.env.NODE_ENV === 'development'
                 ? undefined
