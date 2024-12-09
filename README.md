@@ -33,7 +33,7 @@ The high level goal of the project, is to build a backend microservice that powe
 
 ### Prerequisites
 
-- Node.js
+- Node.js between 22.4.0 and 23.0.0
 - npm or yarn
 - Postgres
 - Redis
