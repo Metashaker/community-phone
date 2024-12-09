@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
-import { CALLS_WEBHOOKS_QUEUE } from 'src/app/shared/queues';
+import { CALLS_WEBHOOKS_QUEUE } from 'src/app/shared/constants';
 
 @Module({
   imports: [

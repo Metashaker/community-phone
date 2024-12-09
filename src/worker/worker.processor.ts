@@ -6,7 +6,7 @@ import {
   CreateCallInput,
   EndCallInput,
 } from '../app/modules/calls/calls.schemas';
-import { CALLS_WEBHOOKS_QUEUE } from 'src/app/shared/queues';
+import { CALLS_WEBHOOKS_QUEUE } from 'src/app/shared/constants';
 
 @Processor(CALLS_WEBHOOKS_QUEUE.name)
 export class WebhookProcessor extends WorkerHost {

@@ -5,7 +5,8 @@ import { CreateCallInput, EndCallInput } from './calls.schemas';
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { CALLS_WEBHOOKS_QUEUE } from 'src/app/shared/queues';
+import { CALLS_WEBHOOKS_QUEUE } from 'src/app/shared/constants';
+import { Response } from 'src/app/shared/shared.types';
 
 @Injectable()
 export class CallsService {
@@ -16,9 +17,7 @@ export class CallsService {
     private readonly callsWebhooksQueue: Queue,
   ) {}
 
-  async addCallToCreateToQueue(
-    call: CreateCallInput,
-  ): Promise<{ success: boolean }> {
+  async addCallToCreateToQueue(call: CreateCallInput): Promise<Response> {
     try {
       const job = await this.callsWebhooksQueue.add(
         CALLS_WEBHOOKS_QUEUE.jobs.createCall,
@@ -35,7 +34,7 @@ export class CallsService {
     }
   }
 
-  async addCallToEndToQueue(call: EndCallInput): Promise<{ success: boolean }> {
+  async addCallToEndToQueue(call: EndCallInput): Promise<Response> {
     try {
       const job = await this.callsWebhooksQueue.add(
         CALLS_WEBHOOKS_QUEUE.jobs.endCall,
@@ -57,7 +56,7 @@ export class CallsService {
    *
    * **Note**: All dates are stored in UTC.
    */
-  async createCall(call: CreateCallInput): Promise<{ success: boolean }> {
+  async createCall(call: CreateCallInput): Promise<Response> {
     try {
       await this.prisma.call.create({
         data: {
@@ -80,7 +79,7 @@ export class CallsService {
    *
    * **Note**: All dates are stored in UTC.
    */
-  async markCallEnded(call: EndCallInput): Promise<{ success: boolean }> {
+  async markCallEnded(call: EndCallInput): Promise<Response> {
     try {
       await this.prisma.call.update({
         where: { remoteCallId: call.remoteCallId },
@@ -103,7 +102,7 @@ export class CallsService {
    *  so we don't return calls that have less than 60 minutes since they were started
    *  since they could still be going.
    */
-  async getFailedCalls(): Promise<Call[]> {
+  async getFailedCalls(): Promise<Response<Call[]>> {
     try {
       // Get the current time in UTC
       const now = new Date();
@@ -113,7 +112,7 @@ export class CallsService {
       // Get the time 60 minutes ago in UTC (minimum time to consider a call as failed)
       const oneHourAgo = new Date(nowUTC.getTime() - 60 * 60 * 1000);
 
-      return await this.prisma.call.findMany({
+      const calls = await this.prisma.call.findMany({
         where: {
           AND: [
             { startedAt: { gte: twoHoursAgo.toISOString() } },
@@ -122,9 +121,11 @@ export class CallsService {
           ],
         },
       });
+
+      return { success: true, data: calls };
     } catch (e) {
       this.logger.error({ error: e }, 'FailedToGetFailedCalls');
-      return [];
+      return { success: false };
     }
   }
 }
