@@ -12,6 +12,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
+    "heroku-prebuild": "./heroku-scripts/create-dotenv.sh",
     "start:dev": "npx prisma migrate dev && nest start --watch",
     "startWorker:dev": "node dist/worker",
     "start:debug": "nest start --debug --watch",
