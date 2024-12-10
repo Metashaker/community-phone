@@ -18,7 +18,7 @@
 
 The high level goal of the project, is to build a backend microservice that powers the calls history feature of the app. This is comprised of the following endpoints:
 
-- `POST /events`: Receives phone carriers webhooks events when a call is started (and created in the DB), or ended (and marked as ended in the DB).
+- `POST /events`: Receives phone carriers webhooks events when a call is started (and created in the DB), or ended (and marked as ended in the DB). **Important note: We call success after a job is successfully enqueued to achieve less latency.**
 - `GET /events/failures`: Returns calls that haven't been marked as ended within the last 2 hours, considering a call can last up to 1 hour. Mostly to monitor the aforementioned calls, since phone carriers sometimes fail to send the ended call webhook event.
 
 ## Architecture and technologies
@@ -77,6 +77,7 @@ To run tests, use the following command:
 npm test
 ```
 ## Other potential improvements
+- Add Taskforce as a dashboard to visualize failed jobs (and all other states), which are not deleted from the queue unless they're deleted manually.
 - Zod for controllers runtime schema validation (ts only gives us compile time validation).
 - Luxon for more legible date handling.
 - created_at and deleted_at timestamps on calls table
