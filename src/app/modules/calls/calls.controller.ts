@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Res, HttpStatus } from '@nestjs/common';
-import { CallEventDTO, FailedCallDTO } from './calls.schemas';
+import { CallEventDTO, callEventSchema, FailedCallDTO } from './calls.schemas';
 import { CallsService } from './calls.service';
 import { Response } from 'src/app/shared/shared.types';
 
@@ -17,6 +17,12 @@ export class CallsController {
     @Body() request: CallEventDTO,
     @Res() response,
   ): Promise<Response> {
+    const validationResult = callEventSchema.safeParse(request);
+    if (!validationResult.success) {
+      return response
+        .status(HttpStatus.BAD_REQUEST)
+        .send({ success: false, errors: validationResult.error.errors });
+    }
     if (request?.started) {
       const { success } = await this.callsService.addCallToCreateToQueue({
         remoteCallId: request.call_id,
