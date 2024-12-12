@@ -78,7 +78,6 @@ npm test
 ```
 ## Other potential improvements
 - Add Taskforce as a dashboard to visualize failed jobs (and all other states), which are not deleted from the queue unless they're deleted manually.
-- Zod for controllers runtime schema validation (ts only gives us compile time validation).
 - Luxon for more legible date handling.
 - created_at and deleted_at timestamps on calls table
 
